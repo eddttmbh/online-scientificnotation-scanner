@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Scientific Notation Analyzer</title>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'JetBrains Mono', monospace;
+    background: radial-gradient(circle at top, #052e16, #000000);
+    color: #a7f3d0;
+    height: 100vh;
+}
+
+/* HEADER */
+header {
+    background: linear-gradient(90deg, #000000, #064e3b);
+    padding: 14px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #10b981;
+}
+
+header h2 {
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+header button {
+    background: transparent;
+    color: #34d399;
+    border: 1px solid #34d399;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+header button:hover {
+    background: #10b981;
+    color: black;
+}
+
+/* CONTAINER */
+.container {
+    max-width: 520px;
+    margin: 90px auto;
+    background: rgba(0,0,0,0.6);
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 0 30px rgba(16,185,129,0.2);
+    animation: fadeIn 1s ease;
+}
+
+/* INPUT */
+input {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    background: black;
+    border: 1px solid #10b981;
+    color: #a7f3d0;
+    border-radius: 8px;
+    outline: none;
+}
+
+input:focus {
+    box-shadow: 0 0 12px #10b981;
+}
+
+/* BUTTON */
+button.scan {
+    width: 100%;
+    margin-top: 16px;
+    padding: 14px;
+    font-size: 16px;
+    background: linear-gradient(90deg, #059669, #10b981);
+    color: black;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+button.scan:hover {
+    transform: scale(1.02);
+}
+
+/* RESULT */
+.result {
+    margin-top: 20px;
+    padding: 15px;
+    border-left: 4px solid #10b981;
+    background: rgba(16,185,129,0.1);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: 0.4s;
+}
+
+.result.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+}
+
+.modal-content {
+    background: black;
+    border: 1px solid #10b981;
+    width: 420px;
+    margin: 120px auto;
+    padding: 20px;
+    border-radius: 12px;
+    animation: fadeIn 0.6s;
+}
+
+.close {
+    float: right;
+    cursor: pointer;
+    color: #34d399;
+    font-weight: bold;
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>Scientific Analyzer</h2>
+    <button onclick="openAbout()">About</button>
+</header>
+
+<div class="container">
+    <h3>Input Number</h3>
+    <input type="text" id="numberInput" placeholder="ex: 300, 6.72e9">
+    <button class="scan" onclick="analyze()">SCAN</button>
+    <div class="result" id="result"></div>
+</div>
+
+<!-- ABOUT MODAL -->
+<div class="modal" id="aboutModal">
+    <div class="modal-content">
+        <span class="close" onclick="closeAbout()">✖</span>
+        <h3>About Program</h3>
+        <p>
+            Scientific Analyzer adalah program online untuk:
+        </p>
+        <ul>
+            <li>✔ Validasi notasi ilmiah</li>
+            <li>✔ Konversi otomatis desimal → scientific</li>
+            <li>✔ Tampilan scanner/analyzer</li>
+        </ul>
+        <p>Format valid: <b>a e n</b> (contoh: 4.32e3)</p>
+    </div>
+</div>
+
+<script>
+function analyze() {
+    const input = document.getElementById("numberInput").value.trim();
+    const result = document.getElementById("result");
+
+    const sciRegex = /^[-+]?\d+(\.\d+)?[eE][-+]?\d+$/;
+
+    result.classList.remove("show");
+
+    setTimeout(() => {
+        if (sciRegex.test(input)) {
+            result.innerHTML = `✅ <b>VALID SCIENTIFIC NOTATION</b><br>${input}`;
+        } 
+        else if (!isNaN(input) && input !== "") {
+            const num = Number(input);
+            const scientific = num.toExponential();
+            result.innerHTML = `⚠ <b>DECIMAL DETECTED</b><br>
+                                Converted → <b>${scientific}</b>`;
+        } 
+        else {
+            result.innerHTML = `❌ <b>INVALID INPUT</b>`;
+        }
+
+        result.classList.add("show");
+    }, 300);
+}
+
+function openAbout() {
+    document.getElementById("aboutModal").style.display = "block";
+}
+
+function closeAbout() {
+    document.getElementById("aboutModal").style.display = "none";
+}
+</script>
+
+</body>
+</html>
