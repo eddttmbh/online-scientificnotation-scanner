@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>Scientific Notation Analyzer</title>
 
-<!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
@@ -17,7 +16,7 @@ body {
     font-family: 'JetBrains Mono', monospace;
     background: radial-gradient(circle at top, #052e16, #000000);
     color: #a7f3d0;
-    height: 100vh;
+    height: 1vh;
 }
 
 /* HEADER */
@@ -50,18 +49,17 @@ header button:hover {
     color: black;
 }
 
-/* CONTAINER */
+/* MAIN */
 .container {
-    max-width: 520px;
-    margin: 90px auto;
+    max-width: 650px;
+    margin: 60px auto;
     background: rgba(0,0,0,0.6);
     padding: 30px;
     border-radius: 14px;
-    box-shadow: 0 0 30px rgba(16,185,129,0.2);
+    box-shadow: 0 0 30px rgba(16,185,129,0.2)5;
     animation: fadeIn 1s ease;
 }
 
-/* INPUT */
 input {
     width: 100%;
     padding: 14px;
@@ -77,7 +75,6 @@ input:focus {
     box-shadow: 0 0 12px #10b981;
 }
 
-/* BUTTON */
 button.scan {
     width: 100%;
     margin-top: 16px;
@@ -100,16 +97,31 @@ button.scan:hover {
 .result {
     margin-top: 20px;
     padding: 15px;
-    border-left: 4px solid #10b981;
     background: rgba(16,185,129,0.1);
-    opacity: 0;
-    transform: translateY(10px);
-    transition: 0.4s;
+    border-left: 4px solid #10b981;
+    display: none;
 }
 
-.result.show {
-    opacity: 1;
-    transform: translateY(0);
+/* STEPS */
+.steps {
+    margin-top: 15px;
+    padding-left: 20px;
+}
+
+/* HISTORY */
+.history {
+    margin-top: 30px;
+}
+
+.history h4 {
+    border-bottom: 1px solid #10b981;
+    padding-bottom: 5px;
+}
+
+.history-item {
+    font-size: 14px;
+    margin-top: 6px;
+    opacity: 0.85;
 }
 
 /* MODAL */
@@ -123,7 +135,7 @@ button.scan:hover {
 .modal-content {
     background: black;
     border: 1px solid #10b981;
-    width: 420px;
+    width: 450px;
     margin: 120px auto;
     padding: 20px;
     border-radius: 12px;
@@ -137,9 +149,8 @@ button.scan:hover {
     font-weight: bold;
 }
 
-/* ANIMATION */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(15px); }
     to { opacity: 1; transform: translateY(0); }
 }
 </style>
@@ -148,15 +159,21 @@ button.scan:hover {
 <body>
 
 <header>
-    <h2>Scientific Analyzer</h2>
+    <h3>Scientific Analyzer</h3>
     <button onclick="openAbout()">About</button>
 </header>
 
 <div class="container">
     <h3>Input Number</h3>
-    <input type="text" id="numberInput" placeholder="ex: 300, 6.72e9">
+    <input type="text" id="numberInput" placeholder="e.g.: 300 or 7.51e-9">
     <button class="scan" onclick="analyze()">SCAN</button>
+
     <div class="result" id="result"></div>
+
+    <div class="history">
+        <h4>History</h4>
+        <div id="historyList"></div>
+    </div>
 </div>
 
 <!-- ABOUT MODAL -->
@@ -165,42 +182,75 @@ button.scan:hover {
         <span class="close" onclick="closeAbout()">✖</span>
         <h3>About Program</h3>
         <p>
-            Scientific Analyzer adalah program online untuk:
+            Scientific Analyzer adalah aplikasi web untuk mendeteksi
+            dan mengonversi notasi ilmiah.
+        </p>
+        <p>
+            <b>Fitur utama:</b>
         </p>
         <ul>
-            <li>✔ Validasi notasi ilmiah</li>
-            <li>✔ Konversi otomatis desimal → scientific</li>
-            <li>✔ Tampilan scanner/analyzer</li>
+            <li>Validasi notasi ilmiah</li>
+            <li>Konversi otomatis desimal → scientific</li>
+            <li>Langkah konversi matematis</li>
+            <li>Riwayat input</li>
         </ul>
-        <p>Format valid: <b>a e n</b> (contoh: 4.32e3)</p>
+        <hr>
+        <p>
+            Nama: Edward Gabriel Alexandro Tatambihe<br>
+            NIM : 241011060031
+        </p>
     </div>
 </div>
 
 <script>
+const historyList = document.getElementById("historyList");
+
 function analyze() {
     const input = document.getElementById("numberInput").value.trim();
     const result = document.getElementById("result");
 
     const sciRegex = /^[-+]?\d+(\.\d+)?[eE][-+]?\d+$/;
+    result.style.display = "block";
 
-    result.classList.remove("show");
+    if (sciRegex.test(input)) {
+        result.innerHTML = `
+            ✅ <b>VALID SCIENTIFIC NOTATION</b><br>
+            ${input}
+        `;
+        addHistory(input, "Scientific notation");
+    }
+    else if (!isNaN(input) && input !== "") {
+        const num = Number(input);
+        const scientific = num.toExponential();
 
-    setTimeout(() => {
-        if (sciRegex.test(input)) {
-            result.innerHTML = `✅ <b>VALID SCIENTIFIC NOTATION</b><br>${input}`;
-        } 
-        else if (!isNaN(input) && input !== "") {
-            const num = Number(input);
-            const scientific = num.toExponential();
-            result.innerHTML = `⚠ <b>DECIMAL DETECTED</b><br>
-                                Converted → <b>${scientific}</b>`;
-        } 
-        else {
-            result.innerHTML = `❌ <b>INVALID INPUT</b>`;
-        }
+        const exponent = scientific.split("e")[1];
+        const mantissa = scientific.split("e")[0];
 
-        result.classList.add("show");
-    }, 300);
+        result.innerHTML = `
+            ⚠ <b>DECIMAL DETECTED</b><br>
+            Converted: <b>${scientific}</b>
+            <div class="steps">
+                <b>Langkah Konversi:</b>
+                <ol>
+                    <li>Geser titik desimal hingga tersisa satu digit non-nol di depan</li>
+                    <li>Nilai depan (mantissa): <b>${mantissa}</b></li>
+                    <li>Jumlah pergeseran menjadi pangkat 10: <b>${exponent}</b></li>
+                    <li>Hasil akhir: <b>${mantissa} × 10<sup>${exponent}</sup></b></li>
+                </ol>
+            </div>
+        `;
+        addHistory(input, scientific);
+    }
+    else {
+        result.innerHTML = `❌ <b>INVALID INPUT</b>`;
+    }
+}
+
+function addHistory(input, output) {
+    const div = document.createElement("div");
+    div.className = "history-item";
+    div.innerHTML = `• ${input} → ${output}`;
+    historyList.prepend(div);
 }
 
 function openAbout() {
